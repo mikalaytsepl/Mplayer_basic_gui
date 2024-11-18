@@ -27,7 +27,7 @@ start_mplayer() {
         echo "Starting MPlayer with file: $path"
 
         # Start MPlayer
-        mplayer -nolirc -input file="/tmp/fifo_for_mplayer" -slave -quiet "$path"
+        mplayer -nolirc -input file="/tmp/fifo_for_mplayer" -slave -really-quiet "$path"
     else
         echo "Video you are trying to play was not found."
     fi

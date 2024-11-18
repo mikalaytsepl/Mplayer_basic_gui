@@ -12,7 +12,8 @@ enum controls{
     SMALL_REW_BW,
     PLAY_PAUSE,
     SMALL_REW_FW,
-    BIG_REW_FW
+    BIG_REW_FW, 
+    QUIT 
 };
 
 int main(){
@@ -51,6 +52,11 @@ int main(){
 
         case BIG_REW_FW:
             write(fd,"seek 60\n",strlen("seek 60\n"));
+            break;
+
+        case QUIT:
+            printf("sending command");
+            write(fd,"q\n",strlen("q\n"));
             break;
 
          default:

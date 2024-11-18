@@ -52,7 +52,7 @@ class MediaPlayerControls(QMainWindow):
         """
         button = QPushButton("", self)
         button.setToolTip(tooltip)  # Optional tooltip
-        button.setFixedSize(50, 50)  # Set button size
+        button.setFixedSize(50, 50)
         button.setStyleSheet(f"""
             QPushButton {{
                 border: none;
@@ -68,18 +68,29 @@ class MediaPlayerControls(QMainWindow):
         button.clicked.connect(lambda: self.send_command_to_c_process(command))
         layout.addWidget(button)
 
+    def closeEvent(self, event):
+        """Ensure the C script process is terminated when the application closes."""
+        print("Exiting...")
+        self.send_command_to_c_process("5")  # Send the quit command to MPlayer
+
+        # Add a small delay to allow the command to be processed
+        self.c_process.waitForBytesWritten(1000)  # Ensure data is written
+
+        if self.c_process.state() == QProcess.Running:
+            print("Terminating C process...")
+            self.c_process.terminate()
+            if not self.c_process.waitForFinished(1000):  # Wait up to 1 second for termination
+                print("C process did not terminate, killing it.")
+                self.c_process.kill()
+
+        super().closeEvent(event)
+
     def send_command_to_c_process(self, command):
         """Send a command (e.g., a number) to the C script via stdin."""
         if self.c_process.state() == QProcess.Running:
             self.c_process.write((command + "\n").encode("utf-8"))  # Send the command to the C script
         else:
             print("C process is not running!")
-
-    def closeEvent(self, event):
-        """Ensure the C script process is terminated when the application closes."""
-        if self.c_process.state() == QProcess.Running:
-            self.c_process.terminate()
-        super().closeEvent(event)
 
 
 if __name__ == "__main__":
